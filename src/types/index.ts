@@ -17,6 +17,7 @@ export interface Anime {
   rate: number | null
   completed_at: string | null
   notes: string | null
+  top10rank?: number | null
   created_at: string
   rewatches?: Rewatch[]
 }

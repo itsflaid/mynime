@@ -13,5 +13,15 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [
+  function({ addUtilities }: any) {
+    addUtilities({
+      '.scrollbar-hide': {
+        '-ms-overflow-style': 'none',
+        'scrollbar-width': 'none',
+        '&::-webkit-scrollbar': { display: 'none' },
+      },
+    })
+  }
+],
 };
