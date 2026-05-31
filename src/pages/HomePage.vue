@@ -76,7 +76,6 @@
 import { computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAnimeStore } from '../stores/anime'
-import type { Anime } from '../types'
 import SectionHeader from '../components/SectionHeader.vue'
 import HScrollRow from '../components/HScrollRow.vue'
 
