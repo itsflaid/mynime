@@ -1,6 +1,6 @@
 <template>
   <span
-    class="inline-flex items-center rounded-full border px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-widest font-jakarta"
+    class="inline-flex items-center rounded-md border px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-widest font-jakarta"
     :style="{ backgroundColor: config.bg, color: config.text, borderColor: config.border }"
   >
     {{ config.label }}

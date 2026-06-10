@@ -1,108 +1,183 @@
 <template>
-  <div class="max-w-5xl mx-auto px-7 py-10 flex flex-col gap-14">
-
-    <!-- Hero -->
-    <div class="flex flex-col gap-2">
-      <p class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest font-jakarta">Personal Archive</p>
-      <h1 class="text-5xl font-bold text-zinc-900 font-jakarta leading-tight">Curated Journey</h1>
-      <p class="text-sm text-zinc-400 font-jakarta mt-1">Catatan perjalanan anime pribadi — dari yang ditonton, lagi jalan, sampai yang masuk wishlist.</p>
-    </div>
-
-    <!-- Stats -->
-    <div class="grid grid-cols-4 gap-4">
-      <div v-for="s in stats" :key="s.label" class="bg-white border border-zinc-200 rounded-2xl px-5 py-5">
-        <div class="font-bold text-4xl font-jakarta leading-none" :style="{ color: s.color }">{{ s.val }}</div>
-        <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-2 font-jakarta">{{ s.label }}</div>
+  <main class="mx-auto flex max-w-6xl flex-col gap-14 px-5 py-8 sm:px-7 sm:py-12">
+    <section class="grid items-stretch gap-6 lg:grid-cols-[1.05fr_0.95fr]">
+      <div class="flex min-h-[360px] flex-col justify-center rounded-[2rem] border border-zinc-200 bg-white p-7 sm:p-10 lg:p-12">
+        <div class="flex w-fit items-center gap-2 rounded-full bg-pink-50 px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.2em] text-pink-600">
+          <Archive :size="13" :stroke-width="1.8" />
+          Personal Archive
+        </div>
+        <h1 class="mt-7 max-w-xl text-5xl font-extrabold leading-[0.98] tracking-[-0.045em] text-zinc-950 sm:text-6xl lg:text-7xl">
+          Stories worth
+          <span class="text-pink-500">remembering.</span>
+        </h1>
+        <p class="mt-6 max-w-lg text-sm leading-7 text-zinc-500 sm:text-base">
+          Catatan perjalanan anime pribadi, dari yang selesai ditonton sampai judul yang masih menunggu giliran.
+        </p>
+        <div class="mt-8 flex flex-wrap items-center gap-3">
+          <RouterLink
+            to="/list"
+            class="inline-flex items-center gap-2 rounded-xl bg-pink-500 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-pink-600"
+          >
+            Jelajahi Koleksi
+            <ArrowRight :size="16" :stroke-width="1.8" />
+          </RouterLink>
+          <span class="text-xs font-semibold text-zinc-400">{{ store.animeList.length }} judul tersimpan</span>
+        </div>
       </div>
-    </div>
 
-    <!-- Top 10 -->
-    <section v-if="top10.length">
-      <SectionHeader title="Top 10 Favorites" desc="Hall of fame koleksi anime terbaik." />
-      <div class="flex gap-5 overflow-x-auto pb-3 scrollbar-hide mt-5">
-        <div
-          v-for="anime in top10" :key="anime.id"
-          @click="router.push(`/anime/${anime.id}`)"
-          class="min-w-[180px] max-w-[180px] flex-shrink-0 cursor-pointer group"
-        >
-          <div class="w-full aspect-[2/3] rounded-2xl overflow-hidden relative shadow-md group-hover:-translate-y-1 group-hover:shadow-pink-200/60 group-hover:shadow-xl transition-all duration-200">
-            <img :src="anime.poster" :alt="anime.title" class="w-full h-full object-cover" />
-            <!-- rank badge -->
-            <div class="absolute top-2.5 left-2.5 w-7 h-7 bg-pink-500 rounded-full flex items-center justify-center shadow-lg shadow-pink-300/50">
-              <span class="text-white text-xs font-bold font-jakarta">{{ anime.top10rank }}</span>
+      <div class="relative min-h-[360px] overflow-hidden rounded-[2rem] border border-zinc-200 bg-zinc-950 text-white">
+        <img
+          v-if="featuredAnime"
+          :src="featuredAnime.poster"
+          :alt="featuredAnime.title"
+          class="absolute inset-0 h-full w-full object-cover opacity-45"
+        />
+        <div class="absolute inset-0 bg-zinc-950/55" />
+
+        <div class="relative flex h-full min-h-[360px] flex-col justify-between p-7 sm:p-9">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <p class="text-[10px] font-extrabold uppercase tracking-[0.22em] text-pink-300">Archive Snapshot</p>
+              <h2 class="mt-2 text-2xl font-bold">{{ featuredAnime ? 'Latest memory' : 'Your collection' }}</h2>
             </div>
-            <!-- rate -->
-            <div v-if="anime.rate" class="absolute bottom-2.5 right-2.5 bg-black/65 rounded-lg px-2 py-1 flex items-center gap-1">
-              <span class="text-pink-400 text-[10px]">★</span>
-              <span class="text-white text-xs font-bold font-jakarta">{{ anime.rate }}</span>
+            <div class="rounded-full border border-white/20 bg-white/10 p-2.5">
+              <Library :size="18" :stroke-width="1.7" />
             </div>
           </div>
-          <div class="mt-2.5">
-            <div class="text-sm font-bold text-zinc-900 font-jakarta truncate">{{ anime.title }}</div>
-            <div v-if="anime.notes" class="text-xs text-zinc-400 truncate mt-0.5">{{ anime.notes }}</div>
+
+          <button
+            v-if="featuredAnime"
+            type="button"
+            class="my-8 max-w-sm text-left"
+            @click="router.push(`/anime/${featuredAnime.id}`)"
+          >
+            <StatusBadge :status="featuredAnime.status" />
+            <h3 class="mt-3 line-clamp-2 text-3xl font-bold leading-tight">{{ featuredAnime.title }}</h3>
+            <p v-if="featuredAnime.notes" class="mt-2 line-clamp-2 text-sm italic leading-relaxed text-zinc-300">
+              "{{ featuredAnime.notes }}"
+            </p>
+          </button>
+
+          <div class="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-white/15 bg-white/15">
+            <div v-for="stat in stats" :key="stat.label" class="bg-zinc-950/75 p-4 backdrop-blur-sm">
+              <div class="flex items-center justify-between gap-2">
+                <component :is="stat.icon" :size="15" :stroke-width="1.7" :style="{ color: stat.color }" />
+                <span class="text-2xl font-extrabold">{{ stat.value }}</span>
+              </div>
+              <p class="mt-2 text-[9px] font-bold uppercase tracking-[0.16em] text-zinc-400">{{ stat.label }}</p>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Recently Completed -->
+    <section v-if="top10.length">
+      <SectionHeader title="Top 10 Favorites" desc="Pilihan terbaik dari seluruh perjalanan menonton." />
+      <div class="mt-5 flex gap-5 overflow-x-auto pb-3 scrollbar-hide">
+        <button
+          v-for="anime in top10"
+          :key="anime.id"
+          type="button"
+          class="group min-w-[180px] max-w-[180px] flex-shrink-0 text-left"
+          @click="router.push(`/anime/${anime.id}`)"
+        >
+          <div class="relative aspect-[2/3] w-full overflow-hidden rounded-2xl bg-zinc-100 shadow-sm transition-all duration-200 group-hover:-translate-y-1 group-hover:shadow-xl group-hover:shadow-pink-100">
+            <img :src="anime.poster" :alt="anime.title" class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
+            <div class="absolute left-2.5 top-2.5 flex h-8 w-8 items-center justify-center rounded-full bg-pink-500 text-xs font-bold text-white shadow-lg shadow-pink-500/30">
+              {{ anime.top10rank }}
+            </div>
+            <div v-if="anime.rate" class="absolute bottom-2.5 right-2.5 flex items-center gap-1 rounded-lg bg-black/70 px-2 py-1">
+              <Star :size="12" :stroke-width="1.8" class="text-pink-400" />
+              <span class="text-xs font-bold text-white">{{ anime.rate }}</span>
+            </div>
+          </div>
+          <div class="mt-2.5 truncate text-sm font-bold text-zinc-900">{{ anime.title }}</div>
+          <div v-if="anime.notes" class="mt-0.5 truncate text-xs text-zinc-400">{{ anime.notes }}</div>
+        </button>
+      </div>
+    </section>
+
     <section v-if="recentCompleted.length">
       <SectionHeader title="Recently Completed" desc="Anime yang baru-baru ini selesai ditonton." />
       <HScrollRow :items="recentCompleted" @card-click="router.push(`/anime/${$event.id}`)" @see-all="router.push('/list?status=completed')" />
     </section>
 
-    <!-- Watching -->
     <section v-if="watching.length">
-      <SectionHeader title="Currently Watching" desc="Lagi on progress." />
+      <SectionHeader title="Currently Watching" desc="Cerita yang sedang berjalan." />
       <HScrollRow :items="watching" @card-click="router.push(`/anime/${$event.id}`)" @see-all="router.push('/list?status=watching')" />
     </section>
 
-    <!-- Watchlist -->
     <section v-if="watchlist.length">
-      <SectionHeader title="Watchlist" desc="Antrian nonton berikutnya." />
+      <SectionHeader title="Watchlist" desc="Antrian untuk perjalanan berikutnya." />
       <HScrollRow :items="watchlist" @card-click="router.push(`/anime/${$event.id}`)" @see-all="router.push('/list?status=watchlist')" />
     </section>
 
-    <!-- On Hold -->
     <section v-if="onhold.length">
-      <SectionHeader title="On Hold" desc="Ditunda dulu, entah sementara atau selamanya." />
+      <SectionHeader title="On Hold" desc="Berhenti sejenak, belum benar-benar selesai." />
       <HScrollRow :items="onhold" @card-click="router.push(`/anime/${$event.id}`)" @see-all="router.push('/list?status=onhold')" />
     </section>
-
-  </div>
+  </main>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
+import { Archive, ArrowRight, Bookmark, CheckCircle2, Eye, Library, PauseCircle, Star } from '@lucide/vue'
 import { useRouter } from 'vue-router'
-import { useAnimeStore } from '../stores/anime'
-import SectionHeader from '../components/SectionHeader.vue'
 import HScrollRow from '../components/HScrollRow.vue'
+import SectionHeader from '../components/SectionHeader.vue'
+import StatusBadge from '../components/StatusBadge.vue'
+import { useAnimeStore } from '../stores/anime'
 
 const router = useRouter()
 const store = useAnimeStore()
 
-onMounted(() => { if (!store.animeList.length) store.fetchAll() })
+onMounted(() => {
+  if (!store.animeList.length) store.fetchAll()
+})
 
 const sortedByDate = computed(() =>
   [...store.animeList].sort((a, b) => {
-    if (!a.completed_at && !b.completed_at) return 0
-    if (!a.completed_at) return 1
-    if (!b.completed_at) return -1
-    return new Date(b.completed_at).getTime() - new Date(a.completed_at).getTime()
-  })
+    const aDate = a.completed_at || a.created_at
+    const bDate = b.completed_at || b.created_at
+    return new Date(bDate).getTime() - new Date(aDate).getTime()
+  }),
 )
 
-const top10        = computed(() => store.animeList.filter(a => a.top10rank).sort((a, b) => (a.top10rank ?? 0) - (b.top10rank ?? 0)))
-const recentCompleted = computed(() => sortedByDate.value.filter(a => a.status === 'completed').slice(0, 8))
-const watching     = computed(() => store.animeList.filter(a => a.status === 'watching').slice(0, 8))
-const watchlist    = computed(() => store.animeList.filter(a => a.status === 'watchlist').slice(0, 8))
-const onhold       = computed(() => store.animeList.filter(a => a.status === 'onhold').slice(0, 8))
+const featuredAnime = computed(() => sortedByDate.value[0] ?? null)
+const top10 = computed(() =>
+  store.animeList
+    .filter(anime => anime.top10rank)
+    .sort((a, b) => (a.top10rank ?? 0) - (b.top10rank ?? 0)),
+)
+const recentCompleted = computed(() => sortedByDate.value.filter(anime => anime.status === 'completed').slice(0, 8))
+const watching = computed(() => sortedByDate.value.filter(anime => anime.status === 'watching').slice(0, 8))
+const watchlist = computed(() => sortedByDate.value.filter(anime => anime.status === 'watchlist').slice(0, 8))
+const onhold = computed(() => sortedByDate.value.filter(anime => anime.status === 'onhold').slice(0, 8))
 
 const stats = computed(() => [
-  { label: 'Completed', val: store.animeList.filter(a => a.status === 'completed').length, color: '#e91e8c' },
-  { label: 'Watching',  val: store.animeList.filter(a => a.status === 'watching').length,  color: '#7c3aed' },
-  { label: 'Watchlist', val: store.animeList.filter(a => a.status === 'watchlist').length, color: '#0891b2' },
-  { label: 'On Hold',   val: store.animeList.filter(a => a.status === 'onhold').length,    color: '#d97706' },
+  {
+    label: 'Completed',
+    value: store.animeList.filter(anime => anime.status === 'completed').length,
+    color: '#f472b6',
+    icon: CheckCircle2,
+  },
+  {
+    label: 'Watching',
+    value: store.animeList.filter(anime => anime.status === 'watching').length,
+    color: '#a78bfa',
+    icon: Eye,
+  },
+  {
+    label: 'Watchlist',
+    value: store.animeList.filter(anime => anime.status === 'watchlist').length,
+    color: '#22d3ee',
+    icon: Bookmark,
+  },
+  {
+    label: 'On Hold',
+    value: store.animeList.filter(anime => anime.status === 'onhold').length,
+    color: '#fbbf24',
+    icon: PauseCircle,
+  },
 ])
 </script>

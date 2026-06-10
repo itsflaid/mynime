@@ -8,7 +8,7 @@
       <div class="w-full aspect-[2/3] rounded-xl overflow-hidden relative shadow-sm group-hover:-translate-y-1.5 group-hover:shadow-pink-200/50 group-hover:shadow-lg transition-all duration-200">
         <img :src="anime.poster" :alt="anime.title" class="w-full h-full object-cover" />
         <div v-if="anime.rate" class="absolute bottom-2 right-2 bg-black/65 rounded-md px-1.5 py-0.5 flex items-center gap-1">
-          <span class="text-pink-400 text-[9px]">★</span>
+          <Star :size="10" :stroke-width="1.8" class="text-pink-400" />
           <span class="text-white text-[11px] font-bold font-jakarta">{{ anime.rate }}</span>
         </div>
       </div>
@@ -22,7 +22,7 @@
       class="min-w-[130px] max-w-[130px] flex-shrink-0 cursor-pointer group"
     >
       <div class="w-full aspect-[2/3] rounded-xl border-2 border-dashed border-zinc-200 flex flex-col items-center justify-center gap-2 group-hover:border-pink-400 group-hover:bg-pink-50/30 transition-all duration-200">
-        <span class="text-2xl text-zinc-300 group-hover:text-pink-400 transition-colors">→</span>
+        <ArrowRight :size="24" :stroke-width="1.6" class="text-zinc-300 transition-colors group-hover:text-pink-400" />
         <span class="text-[10px] font-bold text-zinc-300 group-hover:text-pink-400 uppercase tracking-widest transition-colors font-jakarta">See All</span>
       </div>
     </div>
@@ -30,6 +30,7 @@
 </template>
 
 <script setup lang="ts">
+import { ArrowRight, Star } from '@lucide/vue'
 import type { Anime } from '../types'
 
 defineProps<{ items: Anime[] }>()

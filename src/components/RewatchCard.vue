@@ -9,8 +9,9 @@
           {{ formatDateTime(rewatch.rewatched_at) }}
         </h3>
       </div>
-      <div v-if="rewatch.rate" class="rounded-xl bg-zinc-900 px-3 py-1.5 text-sm font-extrabold text-white">
-        <span class="text-pink-400">★</span> {{ rewatch.rate }}
+      <div v-if="rewatch.rate" class="flex items-center gap-1 rounded-xl bg-zinc-900 px-3 py-1.5 text-sm font-extrabold text-white">
+        <Star :size="14" :stroke-width="1.8" class="text-pink-400" />
+        {{ rewatch.rate }}
       </div>
     </div>
 
@@ -21,6 +22,7 @@
 </template>
 
 <script setup lang="ts">
+import { Star } from '@lucide/vue'
 import type { Rewatch } from '../types'
 
 defineProps<{ rewatch: Rewatch; index: number }>()

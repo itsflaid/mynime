@@ -62,6 +62,49 @@ export const useAnimeStore = defineStore('anime', () => {
     return { error }
   }
 
+  async function updateTop10Rank(animeId: string, newRank: number | null) {
+    if (newRank !== null && (!Number.isInteger(newRank) || newRank < 1 || newRank > 10)) {
+      return { error: new Error('Top 10 rank harus berupa angka 1 sampai 10.') }
+    }
+
+    const { data: rankedAnime, error: fetchError } = await supabase
+      .from('anime')
+      .select('id, top10rank')
+      .not('top10rank', 'is', null)
+      .order('top10rank', { ascending: true })
+
+    if (fetchError) return { error: fetchError }
+
+    const updates: { id: string; top10rank: number | null }[] = []
+
+    if (newRank !== null) {
+      for (const item of rankedAnime ?? []) {
+        if (item.id === animeId || item.top10rank === null || item.top10rank < newRank) continue
+        updates.push({
+          id: item.id,
+          top10rank: item.top10rank >= 10 ? null : item.top10rank + 1,
+        })
+      }
+    }
+
+    updates.push({ id: animeId, top10rank: newRank })
+
+    const results = await Promise.all(
+      updates.map(update =>
+        supabase
+          .from('anime')
+          .update({ top10rank: update.top10rank })
+          .eq('id', update.id),
+      ),
+    )
+    const updateError = results.find(result => result.error)?.error
+
+    if (updateError) return { error: updateError }
+
+    await fetchAll()
+    return { error: null }
+  }
+
   // ── ADD REWATCH ────────────────────────────────────────
   async function addRewatch(payload: Omit<Rewatch, 'id' | 'created_at'>) {
     const { data, error } = await supabase
@@ -81,7 +124,7 @@ export const useAnimeStore = defineStore('anime', () => {
   return {
     animeList, loading,
     fetchAll, fetchOne,
-    addAnime, updateAnime, deleteAnime,
+    addAnime, updateAnime, deleteAnime, updateTop10Rank,
     addRewatch, deleteRewatch,
   }
 })
