@@ -11,6 +11,7 @@ export interface Rewatch {
 
 export interface Anime {
   id: string
+  user_id: string
   title: string
   poster: string
   status: AnimeStatus

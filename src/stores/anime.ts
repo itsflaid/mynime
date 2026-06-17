@@ -2,38 +2,55 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { supabase } from '../lib/supabase'
 import type { Anime, Rewatch } from '../types'
+import { useAuthStore } from './auth'
+
+type AnimeInsert = Omit<Anime, 'id' | 'user_id' | 'created_at' | 'rewatches'>
+type AnimeUpdate = Partial<Omit<Anime, 'id' | 'user_id' | 'created_at' | 'rewatches'>>
 
 export const useAnimeStore = defineStore('anime', () => {
+  const auth = useAuthStore()
   const animeList = ref<Anime[]>([])
   const loading = ref(false)
+
+  function requireUserId() {
+    const userId = auth.user?.id
+    if (!userId) throw new Error('Kamu harus login untuk mengakses data anime.')
+    return userId
+  }
 
   // ── FETCH ALL ──────────────────────────────────────────
   async function fetchAll() {
     loading.value = true
+    const userId = requireUserId()
     const { data, error } = await supabase
       .from('anime')
       .select('*')
+      .eq('user_id', userId)
       .order('completed_at', { ascending: false, nullsFirst: false })
     if (!error && data) animeList.value = data
     loading.value = false
+    return { data, error }
   }
 
   // ── FETCH SINGLE + REWATCHES ───────────────────────────
   async function fetchOne(id: string): Promise<Anime | null> {
+    const userId = requireUserId()
     const { data, error } = await supabase
       .from('anime')
       .select('*, rewatches(*)')
       .eq('id', id)
+      .eq('user_id', userId)
       .single()
     if (error) return null
     return data
   }
 
   // ── ADD ANIME ──────────────────────────────────────────
-  async function addAnime(payload: Omit<Anime, 'id' | 'created_at' | 'rewatches'>) {
+  async function addAnime(payload: AnimeInsert) {
+    const userId = requireUserId()
     const { data, error } = await supabase
       .from('anime')
-      .insert(payload)
+      .insert({ ...payload, user_id: userId })
       .select()
       .single()
     if (!error && data) animeList.value.unshift(data)
@@ -41,11 +58,13 @@ export const useAnimeStore = defineStore('anime', () => {
   }
 
   // ── UPDATE ANIME ───────────────────────────────────────
-  async function updateAnime(id: string, payload: Partial<Anime>) {
+  async function updateAnime(id: string, payload: AnimeUpdate) {
+    const userId = requireUserId()
     const { data, error } = await supabase
       .from('anime')
       .update(payload)
       .eq('id', id)
+      .eq('user_id', userId)
       .select()
       .single()
     if (!error && data) {
@@ -57,7 +76,12 @@ export const useAnimeStore = defineStore('anime', () => {
 
   // ── DELETE ANIME ───────────────────────────────────────
   async function deleteAnime(id: string) {
-    const { error } = await supabase.from('anime').delete().eq('id', id)
+    const userId = requireUserId()
+    const { error } = await supabase
+      .from('anime')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', userId)
     if (!error) animeList.value = animeList.value.filter(a => a.id !== id)
     return { error }
   }
@@ -67,9 +91,11 @@ export const useAnimeStore = defineStore('anime', () => {
       return { error: new Error('Top 10 rank harus berupa angka 1 sampai 10.') }
     }
 
+    const userId = requireUserId()
     const { data: rankedAnime, error: fetchError } = await supabase
       .from('anime')
       .select('id, top10rank')
+      .eq('user_id', userId)
       .not('top10rank', 'is', null)
       .order('top10rank', { ascending: true })
 
@@ -94,7 +120,8 @@ export const useAnimeStore = defineStore('anime', () => {
         supabase
           .from('anime')
           .update({ top10rank: update.top10rank })
-          .eq('id', update.id),
+          .eq('id', update.id)
+          .eq('user_id', userId),
       ),
     )
     const updateError = results.find(result => result.error)?.error
@@ -121,10 +148,15 @@ export const useAnimeStore = defineStore('anime', () => {
     return { error }
   }
 
+  function clear() {
+    animeList.value = []
+    loading.value = false
+  }
+
   return {
     animeList, loading,
     fetchAll, fetchOne,
     addAnime, updateAnime, deleteAnime, updateTop10Rank,
-    addRewatch, deleteRewatch,
+    addRewatch, deleteRewatch, clear,
   }
 })

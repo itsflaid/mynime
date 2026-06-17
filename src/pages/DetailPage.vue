@@ -45,8 +45,7 @@
           <div v-if="showEditForm" class="mt-6 rounded-2xl border border-pink-200 bg-pink-50/40 p-5">
             <div class="flex items-start justify-between gap-4">
               <div>
-                <p class="text-[10px] font-extrabold uppercase tracking-widest text-pink-500">Edit Anime</p>
-                <p class="mt-1 text-xs text-zinc-400">Judul dan poster tetap dikunci.</p>
+                <p class="text-[10px] font-extrabold uppercase tracking-widest text-pink-500">Edit</p>
               </div>
               <button
                 type="button"
@@ -309,7 +308,7 @@
         </button>
       </section>
 
-      <section class="mt-10">
+      <section v-if="anime.status === 'completed'" class="mt-10">
         <div class="mb-5 flex items-end justify-between gap-4">
           <div>
             <p class="text-[11px] font-extrabold uppercase tracking-[0.22em] text-pink-500 font-jakarta">History</p>
@@ -318,12 +317,18 @@
           <span class="text-sm font-bold text-zinc-400">{{ sortedRewatches.length }} log</span>
         </div>
 
+        <p v-if="deleteRewatchError" class="mb-4 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm font-semibold text-red-600">
+          {{ deleteRewatchError }}
+        </p>
+
         <div v-if="sortedRewatches.length" class="grid gap-4 md:grid-cols-2">
           <RewatchCard
             v-for="(rewatch, idx) in sortedRewatches"
             :key="rewatch.id"
             :rewatch="rewatch"
             :index="sortedRewatches.length - idx"
+            :deleting="deletingRewatchId === rewatch.id"
+            @delete="removeRewatch"
           />
         </div>
 
@@ -360,6 +365,8 @@ const top10Error = ref('')
 const showEditForm = ref(false)
 const savingEdit = ref(false)
 const editError = ref('')
+const deletingRewatchId = ref<string | null>(null)
+const deleteRewatchError = ref('')
 
 const editStatuses: { label: string; value: AnimeStatus }[] = [
   { label: 'Completed', value: 'completed' },
@@ -390,7 +397,7 @@ watch(() => route.params.id, loadAnime)
 
 const sortedRewatches = computed(() => {
   const list = anime.value?.rewatches || []
-  return [...list].sort((a, b) => new Date(b.rewatched_at || b.created_at).getTime() - new Date(a.rewatched_at || a.created_at).getTime())
+  return [...list].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 })
 
 async function loadAnime() {
@@ -406,14 +413,20 @@ async function saveRewatch() {
   errorMessage.value = ''
 
   if (!rewatchForm.date) {
-    errorMessage.value = 'Tanggal wajib diisi. Mesin waktu belum masuk roadmap MVP.'
+    errorMessage.value = 'Tanggal rewatch wajib diisi.'
+    return
+  }
+
+  const rate = rewatchForm.rate ? Number(rewatchForm.rate) : null
+  if (rate !== null && (!Number.isFinite(rate) || rate < 1 || rate > 10)) {
+    errorMessage.value = 'Rate rewatch harus berada di antara 1 sampai 10.'
     return
   }
 
   savingRewatch.value = true
   const payload = {
     anime_id: anime.value.id,
-    rate: rewatchForm.rate ? parseFloat(rewatchForm.rate) : null,
+    rate,
     rewatched_at: new Date(`${rewatchForm.date}T${rewatchForm.time || '00:00'}`).toISOString(),
     notes: rewatchForm.notes || null,
   }
@@ -434,6 +447,23 @@ async function saveRewatch() {
     rewatchForm.time = nowTimeInput()
     showRewatchForm.value = false
   }
+}
+
+async function removeRewatch(id: string) {
+  if (!anime.value || deletingRewatchId.value) return
+
+  deletingRewatchId.value = id
+  deleteRewatchError.value = ''
+  const { error } = await store.deleteRewatch(id)
+
+  if (error) {
+    deleteRewatchError.value = error.message || 'Gagal menghapus rewatch.'
+    deletingRewatchId.value = null
+    return
+  }
+
+  anime.value.rewatches = (anime.value.rewatches || []).filter(rewatch => rewatch.id !== id)
+  deletingRewatchId.value = null
 }
 
 function openTop10Editor() {
@@ -552,15 +582,21 @@ async function saveEdit() {
   showEditForm.value = false
 }
 
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des']
-
 function formatDateTime(value: string | null) {
   if (!value) return '-'
-  const dt = new Date(value)
-  if (Number.isNaN(dt.getTime())) return '-'
-  const hh = String(dt.getHours()).padStart(2, '0')
-  const mm = String(dt.getMinutes()).padStart(2, '0')
-  return `${dt.getDate()} ${MONTHS[dt.getMonth()]} ${dt.getFullYear()} · ${hh}:${mm}`
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return '-'
+  return new Intl.DateTimeFormat('id-ID', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+    timeZone: 'Asia/Makassar',
+    timeZoneName: 'short',
+  }).format(date)
 }
 
 function todayInput() {

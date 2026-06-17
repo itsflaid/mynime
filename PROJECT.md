@@ -1,8 +1,8 @@
 # MyNime — Product Brief for AI Agent
 
 ## Overview
-MyNime adalah personal anime tracker web app milik satu user. Versi saat ini belum
-menggunakan auth; Google OAuth dikerjakan setelah seluruh fitur inti di brief ini selesai.
+MyNime adalah personal anime tracker web app dengan akun Google dan archive pribadi
+untuk setiap user.
 Dibangun dengan Vue 3 + TypeScript + Vite + Tailwind CSS v3 + Pinia + Vue Router + Supabase.
 Font: Plus Jakarta Sans (semua elemen). Deploy: Vercel.
 
@@ -35,6 +35,7 @@ Font: Plus Jakarta Sans (semua elemen). Deploy: Vercel.
 
 ### Table: anime
 - id: uuid PK
+- user_id: uuid FK → auth.users.id
 - title: text
 - poster: text (image url from Jikan API)
 - status: text (completed/watching/watchlist/onhold/dropped)
@@ -171,7 +172,7 @@ Font: Plus Jakarta Sans (semua elemen). Deploy: Vercel.
   - Status badge
   - Judul (font bold 28px)
   - Rate: bintang pink + angka besar
-  - Completed at: tanggal lengkap (Senin, 4 Mei 2026) + jam (21.20 WIB)
+  - Completed at: tanggal lengkap Indonesia + jam zona Asia/Makassar (WITA)
   - Notes: italic, quoted
 
 #### Rewatch Section (hanya tampil jika status = completed)
@@ -237,17 +238,17 @@ Trigger: tombol "+ Add Anime" di Navbar
 
 ---
 
-## Authentication (Setelah Core Features)
+## Authentication
 
-Google OAuth dikerjakan setelah implementasi aplikasi sudah sesuai brief ini. Sebelum
-deploy publik, authentication harus disertai ownership data dan RLS, bukan login UI saja.
-
-- Gunakan Supabase Auth dengan provider Google
-- Tambahkan `user_id uuid not null references auth.users(id)` pada tabel `anime`
-- Filter seluruh query anime berdasarkan user aktif
+- Supabase Auth dengan provider Google
+- Login Google pertama otomatis menjadi registrasi akun
+- Route `/`, `/list`, dan `/anime/:id` hanya dapat dibuka user authenticated
+- `/login` menjadi halaman guest dan `/auth/callback` menyelesaikan OAuth redirect
+- Semua query anime difilter berdasarkan `user_id`
 - Ownership `rewatches` mengikuti anime melalui `anime_id`
-- Aktifkan RLS agar user hanya dapat membaca dan mengubah datanya sendiri
-- Tambahkan session loading, route guard, login/logout, dan empty state user baru
+- RLS memastikan user hanya dapat membaca dan mengubah datanya sendiri
+- Navbar menampilkan profil Google dan tombol logout
+- Setup dashboard dan migration dijelaskan di `AUTH_SETUP.md`
 
 ---
 
@@ -255,6 +256,8 @@ deploy publik, authentication harus disertai ownership data dan RLS, bukan login
 - / → HomePage
 - /list → ListPage (support ?status=xxx query param untuk default filter)
 - /anime/:id → DetailPage
+- /login → LoginPage
+- /auth/callback → AuthCallbackPage
 
 ---
 
