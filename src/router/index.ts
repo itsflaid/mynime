@@ -19,6 +19,8 @@ const router = createRouter({
 })
 
 router.beforeEach(async to => {
+  if (to.path === '/auth/callback') return true
+
   const auth = useAuthStore(pinia)
   await auth.initialize()
 
