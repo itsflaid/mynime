@@ -1,6 +1,6 @@
 <template>
   <header class="sticky top-0 z-50 border-b border-zinc-200 bg-white/90 backdrop-blur-xl">
-    <nav class="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:px-6 lg:px-8">
+    <nav class="mx-auto flex h-16 max-w-6xl items-center gap-3 px-5 sm:px-7 md:px-8">
       <RouterLink to="/" class="mr-2 text-xl font-extrabold tracking-[-0.04em] text-pink-500">
         MyNime
       </RouterLink>
@@ -98,7 +98,7 @@
     </nav>
 
     <div v-if="menuOpen" class="border-t border-zinc-100 bg-white px-4 py-4 shadow-lg md:hidden">
-      <div class="mx-auto flex max-w-7xl flex-col gap-3">
+      <div class="mx-auto flex max-w-6xl flex-col gap-3">
         <label class="flex items-center gap-2 rounded-xl bg-zinc-100 px-3.5 py-2.5">
           <Search :size="16" :stroke-width="1.7" class="text-zinc-400" />
           <input

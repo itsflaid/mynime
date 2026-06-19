@@ -1,5 +1,5 @@
 <template>
-  <main class="mx-auto max-w-6xl px-5 py-8 md:px-8">
+  <main class="mx-auto max-w-6xl px-5 py-8 sm:px-7 md:px-8">
     <button
       @click="router.back()"
       class="mb-6 inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white px-4 py-2 text-xs font-extrabold uppercase tracking-widest text-zinc-500 transition-colors hover:text-zinc-900 font-jakarta"

@@ -1,5 +1,5 @@
 <template>
-  <main class="mx-auto flex max-w-6xl flex-col gap-14 px-5 py-8 sm:px-7 sm:py-12">
+  <main class="mx-auto flex max-w-6xl flex-col gap-14 px-5 py-8 sm:px-7 sm:py-12 md:px-8">
     <section class="grid items-stretch gap-6 lg:grid-cols-[1.05fr_0.95fr]">
       <div class="flex min-h-[360px] flex-col justify-center rounded-[2rem] border border-zinc-200 bg-white p-7 sm:p-10 lg:p-12">
         <div class="flex w-fit items-center gap-2 rounded-full bg-pink-50 px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.2em] text-pink-600">

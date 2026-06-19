@@ -1,5 +1,5 @@
 <template>
-  <main class="mx-auto flex max-w-6xl flex-col gap-8 px-5 py-10 md:px-8">
+  <main class="mx-auto flex max-w-6xl flex-col gap-8 px-5 py-10 sm:px-7 md:px-8">
     <section>
       <p class="text-[11px] font-extrabold uppercase tracking-[0.22em] text-pink-500">Personal Archive</p>
       <h1 class="mt-2 text-4xl font-extrabold leading-tight text-zinc-900 md:text-5xl">Curated Journey</h1>
@@ -98,7 +98,7 @@
       />
     </section>
 
-    <section v-else class="grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+    <section v-else class="grid grid-cols-3 gap-3 md:grid-cols-4 md:gap-5 lg:grid-cols-5 xl:grid-cols-6">
       <AnimeCard
         v-for="anime in filteredAnime"
         :key="anime.id"
