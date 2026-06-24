@@ -101,9 +101,7 @@
             placeholder="https://..."
             class="field-input"
           />
-          <p class="mt-1.5 text-xs leading-relaxed text-zinc-400">
-            Gunakan link gambar publik agar poster tetap tampil setelah aplikasi di-deploy.
-          </p>
+
         </div>
       </div>
 

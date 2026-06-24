@@ -11,7 +11,7 @@
           <span class="text-pink-500">remembering.</span>
         </h1>
         <p class="mt-6 max-w-lg text-sm leading-7 text-zinc-500 sm:text-base">
-          Catatan perjalanan anime pribadi, dari yang selesai ditonton sampai judul yang masih menunggu giliran.
+          Sekedar catatan anime yg udah ditonton ataupun masih watchlist.
         </p>
         <div class="mt-8 flex flex-wrap items-center gap-3">
           <RouterLink
@@ -21,7 +21,7 @@
             Jelajahi Koleksi
             <ArrowRight :size="16" :stroke-width="1.8" />
           </RouterLink>
-          <span class="text-xs font-semibold text-zinc-400">{{ store.animeList.length }} judul tersimpan</span>
+          <span class="text-xs font-semibold text-zinc-400">{{ store.animeList.length }} Anime tersimpan</span>
         </div>
       </div>
 
@@ -72,7 +72,7 @@
     </section>
 
     <section v-if="top10.length">
-      <SectionHeader title="Top 10 Favorites" desc="Pilihan terbaik dari seluruh perjalanan menonton." />
+      <SectionHeader title="Top 10 Favorites" desc="My Anime favorite gua." />
       <div class="mt-5 flex gap-5 overflow-x-auto pb-3 scrollbar-hide">
         <button
           v-for="anime in top10"
@@ -98,7 +98,7 @@
     </section>
 
     <section v-if="recentCompleted.length">
-      <SectionHeader title="Recently Completed" desc="Anime yang baru-baru ini selesai ditonton." />
+      <SectionHeader title="Recently Completed" desc="Anime yang baru watashi tonton." />
       <HScrollRow :items="recentCompleted" @card-click="router.push(`/anime/${$event.id}`)" @see-all="router.push('/list?status=completed')" />
     </section>
 

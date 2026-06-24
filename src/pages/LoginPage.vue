@@ -30,7 +30,7 @@
         <p class="mt-6 text-[10px] font-extrabold uppercase tracking-[0.2em] text-pink-500 lg:mt-0">Welcome to MyNime</p>
         <h2 class="mt-2 text-3xl font-extrabold tracking-tight text-zinc-950">Masuk ke archive kamu</h2>
         <p class="mt-3 text-sm leading-6 text-zinc-500">
-          Login pertama dengan Google otomatis membuat akun baru. Tidak perlu form register terpisah.
+          Hayyuk login yahahaha
         </p>
 
         <button
