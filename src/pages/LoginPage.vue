@@ -15,7 +15,7 @@
           <span class="text-pink-400">close.</span>
         </h1>
         <p class="mt-6 max-w-lg text-base leading-8 text-zinc-400">
-          Koleksi, rating, catatan, Top 10, dan histori rewatch kamu tersimpan dalam satu ruang pribadi.
+          Koleksi, rating, catatan, Top fav anime, dan histori rewatch kamu tersimpan dalam satu archive personal.
         </p>
       </div>
 
@@ -49,7 +49,7 @@
 
         <div class="mt-8 flex items-start gap-3 rounded-xl bg-zinc-50 p-4 text-xs leading-5 text-zinc-500">
           <ShieldCheck :size="17" :stroke-width="1.8" class="mt-0.5 flex-shrink-0 text-pink-500" />
-          Data anime dipisahkan per akun dan dilindungi Row Level Security di Supabase.
+          Data animemu dilindungi Row Level Security di Supabase.
         </div>
       </div>
     </section>
